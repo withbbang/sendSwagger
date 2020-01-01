@@ -1,0 +1,224 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Hello World App
+# during dev, should point to your local machine
+host: localhost:8000
+# basePath prefixes all resource paths 
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+securityDefinitions:
+  api_key:
+    type: apiKey
+    in: header
+    name: api_key
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+  - image/png
+  - image/jpg
+paths:
+  /downloadFile:
+    x-swagger-router-controller: getData
+    get:
+      operationId: getFile
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: file
+  /getInfobyHeader:
+    x-swagger-router-controller: getData
+    get:
+      security: #전역에 선언하면 모든 요청에 apiKey가 필요함, 이렇게 한 요청에만 넣으면 그 요청만 apiKey 필요
+        - api_key: []
+      description: ""
+      # used as the method name of the controller
+      operationId: getInfobyHeaders
+      parameters:
+        - name: id
+          in: header
+          description: ""
+          required: true
+          type: integer
+          format: uuid
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/CustomerInfoByHeaders"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /deleteCustomerInfo:
+    x-swagger-router-controller: getData
+    delete:
+      description: ""
+      # used as the method name of the controller
+      operationId: deleteInfo
+      parameters:
+        - name: id
+          in: query
+          description: ""
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/DeleteInfoResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /getCustomerInfo:
+    x-swagger-router-controller: getData
+    get:
+      description: ""
+      # used as the method name of the controller
+      operationId: getInfo
+      parameters:
+        - name: id
+          in: query
+          description: ""
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/CustomerInfoResponses"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /getCustomerInfos:
+    x-swagger-router-controller: getData
+    get:
+      description: ""
+      # used as the method name of the controller
+      operationId: getInfos
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/CustomerInfosResponses"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /notHello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      operationId: notHello
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/notHelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /hello:
+    x-swagger-router-controller: hello_world
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  notHelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  CustomerInfosResponses:
+    required:
+      - informations
+    properties:
+      informations:
+        type: array
+        items:
+          type: object
+          properties:
+            customer_id:
+              type: integer
+            email:
+              type: string
+  CustomerInfoResponses:
+    required:
+      - customer_id
+      - email
+    properties:
+      customer_id:
+        type: integer
+      email:
+        type: string
+  DeleteInfoResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  CustomerInfoByHeaders:
+    required:
+      - customer_id
+      - email
+    properties:
+      customer_id:
+        type: integer
+      email:
+        type: string
+
